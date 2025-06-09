@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>my gift for u</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #fff0f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+      transition: background-color 0.5s ease;
+    }
+
+    .container {
+      text-align: center;
+      padding: 30px;
+      max-width: 600px;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 0 30px rgba(255, 105, 180, 0.3);
+      display: none;
+    }
+
+    .container.active {
+      display: block;
+    }
+
+    h1, h2, h3, p {
+      color: #d63384;
+    }
+
+    button {
+      background-color: #ff69b4;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      margin: 10px;
+      font-size: 1rem;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #e0559d;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .message-box {
+      width: 100%;
+      padding: 20px;
+      background-color: #ff69b4;
+      border-radius: 10px;
+      color: white;
+      margin-top: 20px;
+      text-align: left;
+      white-space: pre-wrap;
+      max-height: 250px;
+      overflow-y: auto;
+      box-sizing: border-box;
+    }
+
+    .heart {
+      font-size: 50px;
+      color: #ff69b4;
+      animation: heartbeat 1.2s infinite;
+      cursor: pointer;
+      user-select: none;
+      margin: 20px 0;
+    }
+
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+    }
+
+    .cake {
+      font-size: 100px;
+      animation: bounce 1s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+      font-size: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+<script>
+  let bgAudio = new Audio("Last Night on Earth [xg_Y7Or_hWM].mp3");
+  bgAudio.loop = false;
+  let isPlaying = false;
+
+  let clickSound = new Audio("click.mp3");
+
+  let page7Audio = new Audio("uia.mp3");
+  page7Audio.loop = true;
+
+  function playAudio() {
+    if (!isPlaying) {
+      bgAudio.play().then(() => {
+        isPlaying = true;
+      }).catch((e) => {
+        alert("Playback error: " + e);
+      });
+    }
+  }
+
+  function pauseAudio() {
+    bgAudio.pause();
+    isPlaying = false;
+  }
+
+  function goToPage(id) {
+    document.querySelectorAll(".container").forEach(c => c.classList.remove("active"));
+    const targetPage = document.getElementById(id);
+    if (targetPage) {
+      targetPage.classList.add("active");
+    }
+
+    if (id === "page7") {
+      document.getElementById("page7").style.display = "block";
+      page7Audio.play();
+    } else {
+      document.getElementById("page7").style.display = "none";
+      page7Audio.pause();
+      page7Audio.currentTime = 0;
+    }
+  }
+
+  function selectSurprise(choice) {
+    document.getElementById("pageMessage").textContent = "The page says...";
+    setTimeout(() => {
+      document.getElementById("pageMessage").textContent = "";
+    }, 1500);
+
+    document.getElementById("loading").classList.remove("hidden");
+
+    setTimeout(() => {
+      document.getElementById("loading").classList.add("hidden");
+      goToPage("page4");
+      const content = document.getElementById("surpriseContent");
+
+      if (choice === "memory") {
+        content.innerHTML = `
+          <h3>cute memo tgt ⋆౨ৎ˚⟡˖ ࣪</h3>
+          <video controls style="max-width: 100%; border-radius: 12px;" poster="video_2025-06-09_16-41-31.mp4">
+            <source src="video_2025-06-09_16-41-31.mp4" type="video/mp4">
+          </video>
+          <p class="memory-caption"> click the video to play </p>
+        `;
+      } else if (choice === "song") {
+        playAudio();
+        content.innerHTML = `
+          <h3> Last Night on Earth </h3>
+          <p>This song reminds me of how deeply someone can feel when words aren’t enough, 
+          when all you want is to give your heart to someone, completely and honestly.
+          If this were my last night on earth, I’d want you to know that your presence has meant more to me than you probably realize. 
+          The way you care, the way you show up, it doesn't go unnoticed. I may not say it all the time, but I appreciate you deeply.
+          Thank you for being someone I can look forward to, someone who makes the world feel a little softer.</p>
+        `;
+      }
+    }, 1000);
+  }
+
+  function toggleLetter() {
+    const msg = document.getElementById("longMessage");
+    msg.classList.toggle("hidden");
+
+    const finalBtn = document.getElementById("finalBtn");
+    if (!msg.classList.contains("hidden")) {
+      finalBtn.classList.remove("hidden");
+    } else {
+      finalBtn.classList.add("hidden");
+    }
+  }
+
+  function goToFinalSurprise() {
+    pauseAudio();
+    goToPage('page6');
+  }
+
+  function handleFormSubmit(event) {
+    event.preventDefault();
+    const form = event.target;
+    fetch(form.action, {
+      method: 'POST',
+      body: new FormData(form),
+      headers: { 'Accept': 'application/json' }
+    }).then(response => {
+      if (response.ok) {
+        document.body.style.backgroundColor = "#ffffff"; 
+        goToPage('page7');
+      } else {
+        alert("Something went wrong!");
+      }
+    });
+  }
+
+  window.onload = () => {
+    goToPage("page1");
+
+    // Attach click sound to buttons AFTER DOM is loaded
+    document.querySelectorAll("button").forEach(button => {
+      button.addEventListener("click", () => {
+        clickSound.currentTime = 0;
+        clickSound.play();
+      });
+    });
+  };
+</script>
+
+<!-- Page 1 -->
+<div class="container" id="page1">
+  <h1>Happy Birthday, Oliver! ( ˶ˆᗜˆ˵ )</h1>
+  <p>I made something just for you</p>
+  <button onclick="goToPage('page2')">Next</button>
+</div>
+
+<!-- Page 2 -->
+<div class="container" id="page2">
+  <h2>⸜(｡˃ ᵕ ˂ )⸝♡</h2>
+  <p>I made this website to make you feel special on your day. I hope this simple gift brings a smile to your face.</p>
+  <button onclick="goToPage('page3')">Continue</button>
+</div>
+
+<!-- Page 3 -->
+<div class="container" id="page3">
+  <h2>Open it one by one</h2>
+  <div class="choices">
+    <button onclick="selectSurprise('song')">Play a Song</button>
+    <button onclick="selectSurprise('memory')">View a Memory</button>
+    <button onclick="goToPage('page5')">Open the Special Letter</button>
+  </div>
+  <p id="loading" class="hidden">Loading your surprise...</p>
+  <p id="pageMessage"></p>
+</div>
+
+<!-- Page 4 -->
+<div class="container" id="page4">
+  <h2>˗ˏˋ ♡ ˎˊ˗</h2>
+  <div id="surpriseContent"></div>
+  <button onclick="goToPage('page3')">Back</button>
+</div>
+
+<!-- Page 5 -->
+<div class="container" id="page5">
+  <h2>a special message for u <3</h2>
+  <div class="heart" onclick="toggleLetter()">❤️</div>
+  <div id="longMessage" class="message-box hidden">
+    Happy birthday, Liam! Today is your day, and i hope you know how much you truly deserve to be celebrated. i just want to say how grateful i am to have crossed paths with someone like you. i admire how you carry yourself, not just in the big things, but in the small, quiet ways you show up. and I’d be lying if I said you haven’t made me smile a little more lately.
+   I remember when u came w me sa earist, i'll never forget that day because it was one of the sweetest thing anyone has ever done for me. super na-appreciate ko talaga siya because you were genuinely willing to be there with me. it softened my heart, knowing na i have someone who's willing to be there for me without needing to be asked. it made me feel seen, valued, and a little less alone. i know i may not always say it out loud kasi i'm not a vocal person talaga, but i hope u feel that i value u, i really do notice and appreciate all the little things you do. from the way u check up on me, how u make time for me, even when u don't have to,it means more than you know. you make my life lighter just by being there for me. there's a calmness in the way you treat me, like walang pressure and confusion,just patience and presence. and u never made me overthink, idk kung anong pag ooverthinkan ko sayo haha. i hope u can wait for me until sa maging ready me na pumasok sa rs. 
+   So today, i just want to say I’m really thankful for you. wishing you the happiest of birthdays and a year filled with peace, joy, and everything that makes your heart smile. i hope you get to feel the warmth of love, fun, and the quiet comfort of knowing that you matter, not just today, but every day. Keep growing, dreaming, loving, and becoming more of yourself with each day. Enjoy your day! again, happy brithdayyyyyy! <3
+  </div>
+  <button onclick="goToPage('page3')">Back</button>
+  <button id="finalBtn" class="hidden" onclick="goToFinalSurprise()">Next</button>
+</div>
+
+<!-- Page 6 -->
+<div class="container" id="page6">
+  <div class="cake">🎂</div>
+  <h2>You're the sweetest slice of happiness!</h2>
+  <p>now it's your turn to leave me something...</p>
+  <form action="https://formspree.io/f/xanjeoaw" method="POST" onsubmit="handleFormSubmit(event)">
+    <textarea name="message" placeholder="Type your message here..." required></textarea>
+    <button type="submit">Send</button>
+  </form>
+</div>
+
+<!-- Page 7 (Final Page) -->
+<div id="page7" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: white; color: #d63384; text-align: center; z-index: 9999; padding: 2rem; box-sizing: border-box;">
+  <img src="ca6c744333366d89b3824449cb844c2e.gif" alt="thank you gif" style="max-width: 100%; max-height: 100vh; object-fit: contain;">
+  <h2 style="margin-top: 1rem;">hwapi bewtdey /ᐠ > ˕ <マ ₊˚⊹♡</h2>
+  <p>the cat wants to sing fow u :D</p>
+</div>
+
+</body>
+</html>
